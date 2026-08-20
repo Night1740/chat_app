@@ -350,24 +350,6 @@
     }
 
     /* ===== ADMIN DASHBOARD ===== */
-    .admin-dashboard {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 24px 32px;
-      max-width: 380px;
-      width: 100%;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      position: relative;
-    }
-
-    .admin-dashboard.active {
-      display: flex;
-    }
-
     .admin-panel {
       background: #4a5568;
       color: white;
@@ -445,11 +427,11 @@
       <form class="login-form" id="loginForm">
         <input type="text" id="adminUsername" placeholder="Username" required>
         <input type="password" id="adminPassword" placeholder="Password" required>
-        <button type="button" class="btn" onclick="handleAdminLogin()">Login as Admin</button>
+        <button type="button" class="btn" id="loginBtn">Login as Admin</button>
       </form>
       
       <p>Or click below to join as a guest:</p>
-      <button type="button" class="btn" onclick="handleGuestLogin()" style="background: #38bdf8; margin-top: 16px;">Join as Guest</button>
+      <button type="button" class="btn" id="guestBtn" style="background: #38bdf8; width: 100%; margin-top: 16px;">Join as Guest</button>
     </div>
 
     <!-- ===== ADMIN DASHBOARD ===== -->
@@ -464,7 +446,7 @@
         <div>
           <label>Create New Channel Code</label>
           <input type="text" id="newCodeInput" placeholder="e.g., general" autocomplete="off">
-          <button type="button" class="btn" onclick="handleCreateChannel()" disabled>Create Channel</button>
+          <button type="button" class="btn" id="createBtn" disabled>Create Channel</button>
         </div>
       </div>
     </div>
@@ -506,13 +488,15 @@
     const chatArea = document.getElementById('chatArea');
     
     // Login elements
+    const loginBtn = document.getElementById('loginBtn');
+    const guestBtn = document.getElementById('guestBtn');
     const adminUsername = document.getElementById('adminUsername');
     const adminPassword = document.getElementById('adminPassword');
     
     // Admin dashboard elements
-    const channelList = document.getElementById('channelList');
-    const newCodeInput = document.getElementById('newCodeInput');
     const createBtn = document.getElementById('createBtn');
+    const newCodeInput = document.getElementById('newCodeInput');
+    const channelList = document.getElementById('channelList');
     
     // Chat elements
     const roomCode = document.getElementById('roomCode');
@@ -550,7 +534,6 @@
     }
 
     function handleGuestLogin() {
-      // Simple guest join - just prompt for name and code
       const name = prompt('Enter your name:');
       if (!name) return;
       
@@ -597,12 +580,9 @@
 
       // Hide login, show chat
       loginScreen.style.display = 'none';
-      
-      setTimeout(() => {
-        adminDashboard.style.display = 'none';
-        chatArea.style.display = 'flex';
-        chatArea.classList.add('active');
-      }, 10);
+      adminDashboard.style.display = 'none';
+      chatArea.style.display = 'block';
+      chatArea.classList.add('active');
 
       // Update UI
       userName.textContent = name;
@@ -639,7 +619,6 @@
 
     // ===== PHASE 3: CHAT INTERFACE =====
 
-    // Send message
     sendBtn.addEventListener('click', () => {
       sendMessage();
     });
@@ -702,18 +681,15 @@
 
     function addSystemMessage(text) {
       const div = document.createElement('div');
-      div.style.cssText = '.text{background:#e2e8f0;color:#718096;padding:10px 12px;border-radius:8px;font-size:11px;}';
       div.innerHTML = `<div class="text" style="background:#e2e8f0;color:#718096;padding:10px 12px;border-radius:8px;font-size:11px;">${escapeHtml(text)}</div>`;
       messages.appendChild(div);
       messages.scrollTop = messages.scrollHeight;
     }
 
     function showError(message) {
-      // Simple error display - create a temporary message
       const div = document.createElement('div');
       div.style.cssText = 'background:#feb23c;color:#991b1b;padding:10px;margin:10px 0;border-radius:6px;text-align:center;font-size:13px;';
       div.textContent = message;
-      // Insert before the form or at bottom of login screen
       const loginForm = document.getElementById('loginForm');
       loginForm.parentNode.insertBefore(div, loginForm);
       setTimeout(() => div.remove(), 5000);
@@ -729,7 +705,7 @@
     }
 
     function showChannelInfo(code) {
-      channelInfo.innerHTML = `<strong>Channel:</strong> <code>${code}</code>`;
+      displayCode.textContent = code;
       channelInfo.style.display = 'block';
     }
 
