@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Chat - Enter Channel Code</title>
+  <title>Simple Chat - Admin Login</title>
   <style>
     * {
       box-sizing: border-box;
@@ -18,6 +18,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin: 0;
     }
 
     .chat-container {
@@ -27,6 +28,12 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .header {
@@ -98,10 +105,19 @@
       cursor: not-allowed;
     }
 
+    .btn-primary {
+      background: #38bdf8;
+    }
+
+    .btn-primary:hover {
+      background: #06d6a0;
+    }
+
     .chat-area {
       display: none;
       flex-direction: column;
       height: 500px;
+      background: #f8f9fa;
     }
 
     .chat-area.active {
@@ -128,6 +144,7 @@
       margin-bottom: 20px;
       border-radius: 6px;
       overflow-wrap: break-word;
+      word-break: break-all;
     }
 
     .sidebar .user {
@@ -135,6 +152,19 @@
       font-size: 11px;
       margin-bottom: 12px;
       text-align: center;
+    }
+
+    .sidebar .admin-status {
+      background: #e53e3e;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
     }
 
     .messages {
@@ -146,7 +176,7 @@
 
     .message {
       margin-bottom: 12px;
-      max-width: 80%;
+      max-width: 85%;
     }
 
     .message.my {
@@ -211,60 +241,6 @@
       cursor: not-allowed;
     }
 
-    .create-channel {
-      margin-top: 16px;
-      padding: 12px;
-      background: #e2e8f0;
-      border-radius: 8px;
-      text-align: center;
-      display: none;
-    }
-
-    .create-channel.admin-show {
-      display: block;
-    }
-
-    .create-channel input {
-      width: 60%;
-      padding: 8px;
-      margin: 4px;
-      border: 1px solid #cbd5e0;
-      border-radius: 4px;
-    }
-
-    .create-channel button {
-      padding: 0 16px;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-
-    .channel-info {
-      margin-top: 20px;
-      padding: 12px;
-      background: #f7fafc;
-      border-radius: 8px;
-      display: none;
-    }
-
-    .channel-info.admin-show {
-      display: block;
-    }
-
-    .channel-info code {
-      word-break: break-all;
-      background: #667eea;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 18px;
-      font-family: monospace;
-      display: block;
-      margin-top: 8px;
-    }
-
     .file-upload {
       margin-top: 12px;
       padding: 8px;
@@ -291,40 +267,179 @@
       border-radius: 4px;
       margin: 2px 0;
     }
+
+    /* Phase 1: Login Screen */
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .login-screen h2 {
+      margin-bottom: 20px;
+      color: #4a5568;
+    }
+
+    .login-screen p {
+      margin-bottom: 20px;
+      color: #718096;
+      font-size: 14px;
+    }
+
+    .login-form {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .login-form input {
+      padding: 12px 16px;
+      border: 2px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+
+    .login-form input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .login-form .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .login-form .remember input {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Phase 2: Admin Dashboard (after login) */
+    .admin-dashboard {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .admin-dashboard.active {
+      display: flex;
+    }
+
+    .admin-panel {
+      background: #4a5568;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .admin-panel h3 {
+      margin-bottom: 15px;
+    }
+
+    .channel-list {
+      background: #fafafa;
+      padding: 15px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .channel-list p {
+      color: #718096;
+      font-size: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .channel-code {
+      background: #667eea;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 18px;
+      margin: 10px 0;
+      word-break: break-all;
+    }
+
+    .share-link {
+      background: #e2e8f0;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin: 8px 0;
+      word-break: break-all;
+    }
+
+    /* Phase 3: Chat Interface */
+    .chat-controls {
+      background: #4a5568;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .chat-controls span {
+      margin-right: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="chat-container" id="chatApp">
-    <!-- Phase 1: Channel Entry -->
-    <div class="header">
-      <h1>Simple Chat</h1>
-      <p>Enter a channel code to join</p>
-    </div>
-    
-    <div class="main">
-      <div class="code-entry">
-        <label>Channel Code</label>
-        <input type="text" id="codeInput" placeholder="e.g., room1" autocomplete="off">
-      </div>
-      <div class="code-entry">
-        <label>Your Name</label>
-        <input type="text" id="nameInput" placeholder="e.g., Alice" autocomplete="off">
-      </div>
-      <button class="btn" id="joinBtn">Join Channel</button>
+    <!-- Phase 1: Admin Login Screen -->
+    <div class="login-screen" id="loginScreen">
+      <h2>Simple Chat</h2>
+      <p>Admin Authentication Required</p>
       
-      <!-- Create Channel Section (Admin only) -->
-      <div class="create-channel" id="createChannelSection">
-        <label>Create New Channel</label>
-        <input type="text" id="newCodeInput" placeholder="e.g., myroom" autocomplete="off">
-        <button class="btn" id="createBtn">Create Channel</button>
+      <form class="login-form" id="loginForm">
+        <input type="text" id="adminUsername" placeholder="Username" required>
+        <input type="password" id="adminPassword" placeholder="Password" required>
+        <button type="submit" class="btn btn-primary">Login as Admin</button>
+      </form>
+      
+      <p>Or enter as a guest:</p>
+      <button class="btn" id="guestBtn">Join as Guest</button>
+    </div>
+
+    <!-- Phase 2: Admin Dashboard (after login) -->
+    <div class="admin-dashboard" id="adminDashboard">
+      <div class="admin-panel">
+        <h3>Admin Panel</h3>
+        <div class="channel-list">
+          <p>No channels created yet</p>
+          <div id="channelList">Create a channel to get started</div>
+        </div>
+        
+        <div>
+          <label>Create New Channel Code</label>
+          <input type="text" id="newCodeInput" placeholder="e.g., general" autocomplete="off">
+          <button class="btn btn-primary" id="createBtn">Create Channel</button>
+        </div>
       </div>
     </div>
 
-    <!-- Phase 2: Chat Interface -->
+    <!-- Phase 3: Chat Interface (for both admin and regular users) -->
     <div class="chat-area" id="chatArea">
       <div class="sidebar">
         <div class="code" id="roomCode"></div>
         <div class="user" id="userName"></div>
+        <div class="admin-status" id="adminStatus"></div>
       </div>
       
       <div class="messages" id="messages"></div>
@@ -335,7 +450,7 @@
       </div>
       
       <div class="channel-info" id="channelInfo">
-        <strong>Your Channel:</strong> <code id="displayCode"></code>
+        <strong>Channel:</strong> <code id="displayCode"></code>
       </div>
       
       <div class="file-upload" id="fileUpload">
@@ -350,87 +465,144 @@
   <script>
     const socket = io();
 
-    const chatApp = document.getElementById('chatApp');
-    const codeInput = document.getElementById('codeInput');
-    const nameInput = document.getElementById('nameInput');
-    const joinBtn = document.getElementById('joinBtn');
-    const createChannelSection = document.getElementById('createChannelSection');
-    const newCodeInput = document.getElementById('newCodeInput');
-    const createBtn = document.getElementById('createBtn');
+    // DOM Elements - Phase 1 (Login)
+    const loginScreen = document.getElementById('loginScreen');
+    const adminDashboard = document.getElementById('adminDashboard');
     const chatArea = document.getElementById('chatArea');
+    const loginForm = document.getElementById('loginForm');
+    const adminUsername = document.getElementById('adminUsername');
+    const adminPassword = document.getElementById('adminPassword');
+    const guestBtn = document.getElementById('guestBtn');
+    const createBtn = document.getElementById('createBtn');
+    const newCodeInput = document.getElementById('newCodeInput');
+    const channelList = document.getElementById('channelList');
+
+    // DOM Elements - Phase 3 (Chat)
     const roomCode = document.getElementById('roomCode');
     const userName = document.getElementById('userName');
     const messages = document.getElementById('messages');
     const msgInput = document.getElementById('msgInput');
     const sendBtn = document.getElementById('sendBtn');
-    const fileInput = document.getElementById('fileInput');
-    const fileList = document.getElementById('fileList');
     const channelInfo = document.getElementById('channelInfo');
     const displayCode = document.getElementById('displayCode');
+    const adminStatus = document.getElementById('adminStatus');
 
+    // State variables
     let currentCode = '';
     let currentName = '';
     let isAdmin = false;
+    let adminName = '';
 
-    // ADMIN CHECK - will be set after join
-    const ADMIN_NAME = 'Admin'; // Must match server.js ADMIN_NAME
+    // ADMIN CREDENTIALS (match server.js)
+    const ADMIN_USERNAME = 'DarkTiger';
+    const ADMIN_PASSWORD = 'night_1117';
 
-    // Phase 1: Join channel
-    joinBtn.addEventListener('click', () => {
-      const code = codeInput.value.trim();
-      const name = nameInput.value.trim();
+    // ===== PHASE 1: Admin Login =====
 
-      if (!code || !name) {
-        alert('Please enter both channel code and your name');
+    // Handle login form submission
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const username = adminUsername.value.trim();
+      const password = adminPassword.value.trim();
+
+      if (!username || !password) {
+        alert('Please enter both username and password');
         return;
       }
 
+      // Send credentials to server
+      socket.emit('admin login', { username, password });
+    });
+
+    // Handle login success/failure from server
+    socket.on('admin login success', (result) => {
+      if (result.success) {
+        isAdmin = true;
+        adminName = result.username || 'DarkTiger';
+        
+        // Show admin dashboard, hide login
+        loginScreen.classList.add('hidden');
+        adminDashboard.classList.add('active');
+        
+        // Update UI
+        userName.textContent = adminName;
+        adminStatus.innerHTML = '<span style="background: #e53e3e;"></span> Admin';
+        
+        // Show channel creation UI
+        createBtn.disabled = false;
+        
+        // Notify server this admin is connected
+        socket.emit('identify admin', { name: adminName });
+      } else {
+        alert('Login failed: ' + (result.error || 'Invalid credentials'));
+      }
+    });
+
+    // Guest join option
+    guestBtn.addEventListener('click', () => {
+      // Hide login, show chat as guest (non-admin)
+      loginScreen.classList.add('hidden');
+      adminDashboard.classList.add('hidden');
+      chatArea.classList.add('active');
+      
+      // Prompt for name and code
+      const guestName = prompt('Enter your name:');
+      if (!guestName) return;
+      
+      const guestCode = prompt('Enter channel code:');
+      if (!guestCode) return;
+      
+      joinAsGuest(guestName, guestCode);
+    });
+
+    function joinAsGuest(name, code) {
       currentCode = code;
       currentName = name;
-      isAdmin = name === ADMIN_NAME;
+      isAdmin = false;
 
-      socket.emit('join room', { code, name, isAdmin });
+      socket.emit('join room', { code, name });
 
-      // Show chat area, hide entry
-      chatApp.classList.add('phase-completed');
+      // Show chat area, hide others
+      loginScreen.classList.add('hidden');
+      adminDashboard.classList.add('hidden');
+      chatArea.classList.add('active');
+
+      // Update UI
+      userName.textContent = name;
+      adminStatus.innerHTML = '<span style="background: #38bdf8;"></span> Guest';
+      roomCode.textContent = code;
+      displayCode.textContent = code;
+    }
+
+    // ===== PHASE 2: Admin Channel Creation =====
+
+    // Create channel button
+    createBtn.addEventListener('click', () => {
+      if (!isAdmin) return;
+      const newCode = newCodeInput.value.trim();
+      if (!newCode) {
+        alert('Please enter a channel code name');
+        return;
+      }
       
-      // Show/hide create channel button
-      createChannelSection.classList.toggle('admin-show', isAdmin);
+      socket.emit('create channel', { code: newCode });
+      newCodeInput.value = '';
     });
 
-    // Listen for join confirmation and messages
-    socket.on('load messages', (msgs) => {
-      messages.innerHTML = '';
-      msgs.forEach(msg => addMessageToDOM(msg.name, msg.text, false));
-    });
-
-    socket.on('chat message', (data) => {
-      addMessageToDOM(data.name, data.text, false);
-    });
-
-    socket.on('user joined', (data) => {
-      addSystemMessage(`${data.name} joined the room`);
-      // Show channel info for admin
-      if (data.isAdmin) {
-        channelInfo.classList.add('admin-show');
-        displayCode.textContent = data.code;
-      }
-    });
-
-    socket.on('user left', (data) => {
-      addSystemMessage(`${data.name} left the room`);
-    });
-
-    socket.on('channel created', (data) => {
+    // Handle channel created event from server
+    socket.on('channel created', (data) {
       addSystemMessage(`New channel created: ${data.code}`);
-      // If admin created it, show their channel info
-      if (data.admin && data.admin === currentName) {
-        channelInfo.classList.add('admin-show');
-        displayCode.textContent = data.code;
-      }
+      // Add to channel list
+      const codeDiv = document.createElement('div');
+      codeDiv.className = 'channel-code';
+      codeDiv.textContent = data.code;
+      channelList.appendChild(codeDiv);
     });
 
-    // Phase 2: Send message
+    // ===== PHASE 3: Chat Interface =====
+
+    // Send message
     sendBtn.addEventListener('click', () => {
       const text = msgInput.value.trim();
       if (!text) return;
@@ -446,28 +618,32 @@
       }
     });
 
-    // Create Channel (Admin only)
-    createBtn.addEventListener('click', () => {
-      if (!isAdmin) return;
-      const newCode = newCodeInput.value.trim();
-      if (!newCode) {
-        alert('Please enter a channel code name');
-        return;
-      }
-      socket.emit('create channel', { code: newCode });
-      newCodeInput.value = '';
+    // Listen for join confirmation and messages
+    socket.on('load messages', (msgs) => {
+      messages.innerHTML = '';
+      msgs.forEach(msg => addMessageToDOM(msg.name, msg.text, false));
     });
 
-    // File upload
-    fileInput.addEventListener('change', (e) => {
-      const files = e.target.files;
-      if (files.length === 0) return;
+    socket.on('chat message', (data) => {
+      addMessageToDOM(data.name, data.text, false);
+    });
 
-      const formData = new FormData();
-      Array.from(files).forEach(file => formData.append('files', file));
+    socket.on('user joined', (data) => {
+      addSystemMessage(`${data.name} joined the room`);
+      if (data.isAdmin) {
+        channelInfo.classList.add('admin-show');
+        displayCode.textContent = data.code;
+        adminStatus.innerHTML = '<span style="background: #e53e3e;"></span> Admin';
+      }
+    });
 
-      socket.emit('upload file', { code: currentCode, formData });
-      msgInput.value = '';
+    socket.on('user left', (data) => {
+      addSystemMessage(`${data.name} left the room`);
+    });
+
+    // Handle join denied (non-admin trying to join non-existent room)
+    socket.on('join denied', (data) => {
+      alert(data.error || 'Could not join channel');
     });
 
     function addMessageToDOM(name, text, isMyMessage) {
