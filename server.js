@@ -9,13 +9,19 @@ const io = new Server(server);
 app.use(express.static('public'));
 
 const rooms = {};
+const ADMIN_NAME = 'Admin'; // Change this to your desired admin name
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('join room', ({ code, name }) => {
+    const isAdmin = name === ADMIN_NAME;
+
     if (!rooms[code]) {
-      rooms[code] = { messages: [], users: new Set() };
+      rooms[code] = { messages: [], users: new Set(), createdBy: null };
+      if (isAdmin) {
+        rooms[code].createdBy = name;
+      }
     }
 
     socket.join(code);
@@ -26,7 +32,18 @@ io.on('connection', (socket) => {
     socket.emit('load messages', room.messages);
 
     // Notify others
-    socket.to(code).emit('user joined', { name, code });
+    socket.to(code).emit('user joined', { name, code, isAdmin });
+
+    // Handle create channel (admin only)
+    if (isAdmin) {
+      socket.on('create channel', ({ code: newCode }) => {
+        if (!rooms[newCode]) {
+          rooms[newCode] = { messages: [], users: new Set(), createdBy: name };
+          socket.join(newCode);
+          socket.to(code).emit('channel created', { code: newCode, admin: name });
+        }
+      });
+    }
 
     socket.on('disconnect', () => {
       rooms[code].users.delete(name);
