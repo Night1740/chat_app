@@ -414,7 +414,7 @@
       <form class="login-form" id="loginForm">
         <input type="text" id="adminUsername" placeholder="Username" required>
         <input type="password" id="adminPassword" placeholder="Password" required>
-        <button type="submit" class="btn btn-primary">Login as Admin</button>
+        <button class="btn btn-primary" onclick="handleAdminLogin()">Login as Admin</button>
       </form>
       
       <p>Or enter as a guest:</p>
@@ -497,16 +497,12 @@
     let isAdmin = false;
     let adminName = '';
 
-    // ADMIN CREDENTIALS (match server.js)
+// ADMIN CREDENTIALS (match server.js)
     const ADMIN_USERNAME = 'DarkTiger';
     const ADMIN_PASSWORD = 'night_1117';
 
-    // ===== PHASE 1: Admin Login =====
-
-    // Handle login form submission
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-
+    // Admin login via button click
+    function handleAdminLogin() {
       const username = adminUsername.value.trim();
       const password = adminPassword.value.trim();
 
@@ -517,7 +513,7 @@
 
       // Send credentials to server
       socket.emit('admin login', { username, password });
-    });
+    }
 
     // Handle login success/failure from server
     socket.on('admin login success', (result) => {
