@@ -3,196 +3,164 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Chat - Admin Login</title>
+  <title>Simple Chat</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       margin: 0;
-      overflow-x: hidden;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: 
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 80% 50% at 80% 80%, rgba(118, 74, 162, 0.15) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+    #chatApp {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .chat-container {
-      position: relative;
-      z-index: 1;
       width: 100%;
-      max-width: 420px;
-      background: white;
-      border-radius: 16px;
+      height: 100%;
+      background: #1a1a2e;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .header {
-      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    .chat-header {
+      background: #16213e;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       color: white;
-      padding: 30px 24px;
-      text-align: center;
+      border-bottom: 1px solid #333;
     }
 
-    .header h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.5px; }
-    .header p { font-size: 13px; opacity: 0.8; }
-
-    .main { padding: 24px; }
-
-    .code-entry { margin-bottom: 20px; }
-    .code-entry label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #4a5568; }
-    .code-entry input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: all 0.2s ease; font-family: inherit; }
-    .code-entry input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15); }
-
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; min-width: 120px; padding: 12px 24px;
-      background: #667eea; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s ease; font-family: inherit; margin-top: 8px;
+    .chat-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
     }
-    .btn:hover { background: #5a67d8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
-    .btn:active { transform: translateY(0); }
-    .btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-    .btn:disabled { background: #a0aec0; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .chat-area { display: none; flex-direction: column; height: 500px; background: #f8f9fa; }
-    .chat-area.active { display: flex; }
-
-    .sidebar { width: 56px; background: #2d3748; padding: 12px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-    .sidebar .code { background: #4a5568; color: white; padding: 6px; width: 100%; text-align: center; font-size: 11px; margin-bottom: 16px; border-radius: 4px; overflow-wrap: break-word; word-break: break-all; min-height: 28px; }
-    .sidebar .user { color: #cbd5e0; font-size: 10px; margin-bottom: 8px; text-align: center; }
-    .sidebar .status-dot { width: 16px; height: 16px; border-radius: 50%; margin-bottom: 8px; }
-    .status-admin { background: #e53e3e; }
-    .status-guest { background: #38bdf8; }
-
-    .messages { flex: 1; padding: 12px; overflow-y: auto; background: #fafafa; }
-    .message { margin-bottom: 10px; max-width: 85%; }
-    .message.my { margin-left: auto; max-width: 85%; }
-    .message .name { font-size: 11px; color: #718096; margin-bottom: 2px; display: block; }
-    .message .text { background: white; padding: 10px 12px; border-radius: 8px; line-height: 1.4; }
-    .message.my .text { background: #667eea; color: white; }
-
-    .input-area { padding: 12px; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
-    .input-area input { flex: 1; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.2s ease; font-family: inherit; }
-    .input-area input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15); }
-    .input-area button { padding: 0 16px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; }
-
-    .input-area button:disabled { background: #a0aec0; cursor: not-allowed; }
-
-    .file-upload { margin-top: 8px; padding: 6px; border: 2px dashed #cbd5e0; border-radius: 6px; text-align: center; color: #718096; font-size: 12px; }
-    .file-upload input { display: none; }
-    .file-list { margin-top: 4px; max-height: 120px; overflow-y: auto; font-size: 11px; }
-    .file-item { background: #edf2f7; padding: 3px 6px; border-radius: 3px; margin: 1px 0; font-size: 11px; }
-
-    /* ===== LOGIN SCREEN ===== */
-    .login-screen {
-      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-      border-radius: 20px; padding: 40px 32px; max-width: 380px; width: 100%;
-      text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3); position: relative;
+    .chat-header .info {
+      font-size: 12px;
+      opacity: 0.7;
     }
-    .login-screen h2 { margin-bottom: 28px; font-size: 24px; background: linear-gradient(135deg, #4a5568, #2d3748); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .login-screen p { margin-bottom: 20px; font-size: 14px; color: #718096; }
 
-    .login-form { display: flex; flex-direction: column; gap: 12px; }
-    .login-form input { padding: 12px 16px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s; }
-    .login-form input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15); outline: none; }
-    .login-form .btn { width: 100%; }
-
-    /* ===== ADMIN DASHBOARD ===== */
-    .admin-dashboard {
-      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-      border-radius: 20px; padding: 24px 32px; max-width: 380px; width: 100%;
-      display: none; flex-direction: column; align-items: center; gap: 20px; position: relative;
+    .chat-area {
+      flex: 1;
+      background: #1a1a2e;
+      overflow-y: auto;
+      padding: 20px;
+      color: #fff;
     }
-    .admin-dashboard.active { display: flex; }
 
-    .admin-panel { background: #4a5568; color: white; padding: 20px; border-radius: 12px; width: 100%; max-width: 360px; text-align: center; }
-    .admin-panel h3 { margin-bottom: 15px; font-size: 18px; }
-    .channel-list { background: #fafafa; padding: 15px; border-radius: 12px; width: 100%; max-width: 360px; max-height: 180px; overflow-y: auto; text-align: center; }
-    .admin-panel p { color: #718096; font-size: 12px; margin-bottom: 10px; }
-    .channel-code { background: #667eea; color: white; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 18px; margin: 8px 0; word-break: break-all; }
-    .share-link { background: #e2e8f0; padding: 6px; border-radius: 4px; font-size: 11px; margin: 4px 0; word-break: break-all; }
+    .message {
+      margin-bottom: 15px;
+      max-width: 80%;
+    }
 
-    /* ===== CHAT INTERFACE ===== */
-    .chat-controls { background: #4a5568; color: white; padding: 8px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; }
-    .chat-controls span { margin-right: 12px; }
+    .message.my {
+      margin-left: auto;
+      max-width: 80%;
+      text-align: right;
+    }
+
+    .message .name {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .message .text {
+      background: #4a90e2;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.4;
+    }
+
+    .message.other .text {
+      background: #3b3b4f;
+      color: #fff;
+    }
+
+    .input-area {
+      padding: 20px;
+      background: #16213e;
+      display: flex;
+      gap: 12px;
+      border-top: 1px solid #333;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 20px;
+      background: #2d3748;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .input-area button {
+      padding: 0 24px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .status-bar {
+      background: #0d1117;
+      padding: 8px 20px;
+      color: #888;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-bar .users {
+      font-weight: 500;
+    }
+
+    /* Hide code display */
+    .code-display { display: none; }
   </style>
 </head>
 <body>
-  <div class="chat-container" id="chatApp">
-    <!-- ===== LOGIN SCREEN ===== -->
-    <div class="login-screen" id="loginScreen">
-      <h2>Simple Chat</h2>
-      <p>Admin Authentication Required</p>
-      
-      <form class="login-form" id="loginForm">
-        <input type="text" id="adminUsername" placeholder="Username" required>
-        <input type="password" id="adminPassword" placeholder="Password" required>
-        <button type="button" class="btn" id="loginBtn" onclick="handleAdminLogin()">Login as Admin</button>
-      </form>
-      
-      <p>Or click below to join as a guest:</p>
-      <button type="button" class="btn" id="guestBtn" style="background: #38bdf8; width: 100%; margin-top: 16px;" onclick="handleGuestLogin()">Join as Guest</button>
+  <div id="chatApp">
+    <div class="chat-header">
+      <h1>Simple Chat</h1>
+      <div class="info" id="roomInfo">Join a channel to chat</div>
     </div>
 
-    <!-- ===== ADMIN DASHBOARD ===== -->
-    <div class="admin-dashboard" id="adminDashboard">
-      <div class="admin-panel">
-        <h3>Admin Panel</h3>
-        <div class="channel-list">
-          <p>No channels created yet</p>
-          <div id="channelList">Create a channel to get started</div>
-        </div>
-        
-        <div>
-          <label>Create New Channel Code</label>
-          <input type="text" id="newCodeInput" placeholder="e.g., general" autocomplete="off">
-          <button type="button" class="btn" id="createBtn" disabled>Create Channel</button>
-        </div>
-      </div>
+    <div class="chat-area" id="messagesArea">
+      <!-- Messages loaded via socket.io -->
     </div>
 
-    <!-- ===== CHAT INTERFACE ===== -->
-    <div class="chat-area" id="chatArea">
-      <div class="sidebar">
-        <div class="code" id="roomCode"></div>
-        <div class="user" id="userName"></div>
-        <div class="status-dot status-admin" id="adminStatus"></div>
-      </div>
-      
-      <div class="messages" id="messages"></div>
-      
-      <div class="input-area">
-        <input type="text" id="msgInput" placeholder="Type a message..." autocomplete="off">
-        <button type="button" class="btn" id="sendBtn">Send</button>
-      </div>
-      
-      <div class="channel-info" id="channelInfo">
-        <strong>Channel:</strong> <code id="displayCode"></code>
-      </div>
-      
-      <div class="file-upload" id="fileUpload">
-        <p>Upload File</p>
-        <input type="file" id="fileInput" accept="image/*">
-        <div class="file-list" id="fileList"></div>
-      </div>
+    <div class="input-area">
+      <input type="text" id="msgInput" placeholder="Type a message..." autocomplete="off">
+      <button id="sendBtn">Send</button>
+    </div>
+
+    <div class="status-bar">
+      <span class="users" id="userCount">0</span>
     </div>
   </div>
 
@@ -200,143 +168,16 @@
   <script>
     const socket = io();
 
-    // ===== DOM ELEMENTS =====
-    const loginScreen = document.getElementById('loginScreen');
-    const adminDashboard = document.getElementById('adminDashboard');
-    const chatArea = document.getElementById('chatArea');
-    
-    // Login elements
-    const loginBtn = document.getElementById('loginBtn');
-    const guestBtn = document.getElementById('guestBtn');
-    const adminUsername = document.getElementById('adminUsername');
-    const adminPassword = document.getElementById('adminPassword');
-    
-    // Admin dashboard elements
-    const createBtn = document.getElementById('createBtn');
-    const newCodeInput = document.getElementById('newCodeInput');
-    const channelList = document.getElementById('channelList');
-    
-    // Chat elements
-    const roomCode = document.getElementById('roomCode');
-    const userName = document.getElementById('userName');
-    const messages = document.getElementById('messages');
     const msgInput = document.getElementById('msgInput');
     const sendBtn = document.getElementById('sendBtn');
-    const channelInfo = document.getElementById('channelInfo');
-    const displayCode = document.getElementById('displayCode');
-    const adminStatus = document.getElementById('adminStatus');
+    const messagesArea = document.getElementById('messagesArea');
+    const roomInfo = document.getElementById('roomInfo');
+    const userCount = document.getElementById('userCount');
 
-    // ===== STATE =====
     let currentCode = '';
     let currentName = '';
-    let isAdmin = false;
-    let adminName = '';
 
-    // ===== CREDENTIALS (must match server.js) =====
-    const CORRECT_USERNAME = 'DarkTiger';
-    const CORRECT_PASSWORD = 'night_1117';
-
-    // ===== PHASE 1: LOGIN =====
-
-    function handleAdminLogin() {
-      const username = adminUsername.value.trim();
-      const password = adminPassword.value.trim();
-
-      if (!username || !password) {
-        showError('Please enter both username and password');
-        return;
-      }
-
-      // Emit login event to server
-      socket.emit('admin login', { username, password });
-    }
-
-    function handleGuestLogin() {
-      const name = prompt('Enter your name:');
-      if (!name) return;
-      
-      const code = prompt('Enter channel code:');
-      if (!code) return;
-      
-      joinAsGuest(name, code);
-    }
-
-    // Listen for login response from server
-    socket.on('admin login success', (result) => {
-      if (result.success) {
-        isAdmin = true;
-        adminName = result.username || CORRECT_USERNAME;
-        
-        // Hide login, show admin dashboard
-        loginScreen.style.display = 'none';
-        adminDashboard.style.display = 'flex';
-        adminDashboard.classList.add('active');
-        
-        // Update UI
-        userName.textContent = adminName;
-        adminStatus.className = 'status-dot status-admin';
-        
-        // Enable channel creation
-        createBtn.disabled = false;
-        createBtn.innerHTML = 'Create Channel';
-        
-        // Notify server
-        socket.emit('identify admin', { name: adminName });
-      } else {
-        showError('Login failed: ' + (result.error || 'Invalid credentials'));
-      }
-    });
-
-    // ===== PHASE 2: GUEST JOIN =====
-
-    function joinAsGuest(name, code) {
-      currentCode = code;
-      currentName = name;
-      isAdmin = false;
-
-      socket.emit('join room', { code, name });
-
-      // Hide login, show chat
-      loginScreen.style.display = 'none';
-      adminDashboard.style.display = 'none';
-      chatArea.style.display = 'block';
-      chatArea.classList.add('active');
-
-      // Update UI
-      userName.textContent = name;
-      adminStatus.className = 'status-dot status-guest';
-      roomCode.textContent = code;
-      displayCode.textContent = code;
-    }
-
-    // ===== PHASE 2: ADMIN CHANNEL CREATION =====
-
-    createBtn.addEventListener('click', () => {
-      if (!isAdmin) return;
-      const newCode = newCodeInput.value.trim();
-      if (!newCode) {
-        showError('Please enter a channel code name');
-        return;
-      }
-      
-      socket.emit('create channel', { code: newCode });
-      newCodeInput.value = '';
-    });
-
-    socket.on('channel created', (data) => {
-      showMessage(`New channel created: ${data.code}`);
-      addChannelToList(data.code);
-    });
-
-    function addChannelToList(code) {
-      const div = document.createElement('div');
-      div.className = 'channel-code';
-      div.textContent = code;
-      channelList.appendChild(div);
-    }
-
-    // ===== PHASE 3: CHAT INTERFACE =====
-
+    // Send message
     sendBtn.addEventListener('click', () => {
       sendMessage();
     });
@@ -356,9 +197,9 @@
       msgInput.value = '';
     }
 
-    // Listen for join confirmation and messages
+    // Listen for messages
     socket.on('load messages', (msgs) => {
-      messages.innerHTML = '';
+      messagesArea.innerHTML = '';
       msgs.forEach(msg => addMessageToDOM(msg.name, msg.text, false));
     });
 
@@ -367,64 +208,39 @@
     });
 
     socket.on('user joined', (data) => {
-      addSystemMessage(`${data.name} joined the room`);
-      if (data.isAdmin) {
-        showChannelInfo(data.code);
-        adminStatus.className = 'status-dot status-admin';
-      }
+      updateUserCount();
+      addSystemMessage(`${data.name} joined`);
     });
 
     socket.on('user left', (data) => {
-      addSystemMessage(`${data.name} left the room`);
+      updateUserCount();
+      addSystemMessage(`${data.name} left`);
     });
-
-    socket.on('join denied', (data) => {
-      showError(data.error || 'Could not join channel');
-    });
-
-    // ===== UTILITY FUNCTIONS =====
 
     function addMessageToDOM(name, text, isMyMessage) {
-      const div = document.createElement('div');
-      div.className = `message ${isMyMessage ? 'my' : ''}`;
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${isMyMessage ? 'my' : 'other'}`;
       
-      div.innerHTML = `
-        <span class="name">${escapeHtml(name)}</span>
+      msgDiv.innerHTML = `
+        <div class="name">${isMyMessage ? 'You' : name}</div>
         <div class="text">${escapeHtml(text)}</div>
       `;
       
-      messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
+      messagesArea.appendChild(msgDiv);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
     }
 
     function addSystemMessage(text) {
-      const div = document.createElement('div');
-      div.innerHTML = `<div class="text" style="background:#e2e8f0;color:#718096;padding:10px 12px;border-radius:8px;font-size:11px;">${escapeHtml(text)}</div>`;
-      messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
+      const msgDiv = document.createElement('div');
+      msgDiv.style.cssText = 'background: #2d374f; padding: 10px; margin: 10px 0; border-radius: 8px;';
+      msgDiv.innerHTML = `<div style="color: #888;">${text}</div>`;
+      messagesArea.appendChild(msgDiv);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
     }
 
-    function showError(message) {
-      const div = document.createElement('div');
-      div.style.cssText = 'background:#feb23c;color:#991b1b;padding:10px;margin:10px 0;border-radius:6px;text-align:center;font-size:13px;';
-      div.textContent = message;
-      const loginForm = document.getElementById('loginForm');
-      loginForm.parentNode.insertBefore(div, loginForm);
-      setTimeout(() => div.remove(), 5000);
-    }
-
-    function showMessage(text) {
-      const div = document.createElement('div');
-      div.style.cssText = 'background:#38bdf8;color:white;padding:10px;margin:10px 0;border-radius:6px;text-align:center;font-size:13px;';
-      div.textContent = text;
-      const sidebar = document.querySelector('.sidebar');
-      sidebar.insertBefore(div, sidebar.firstChild);
-      setTimeout(() => div.remove(), 3000);
-    }
-
-    function showChannelInfo(code) {
-      displayCode.textContent = code;
-      channelInfo.style.display = 'block';
+    function updateUserCount() {
+      // Count users in rooms - simple approach
+      socket.emit('join room', { code: currentCode, name: currentName });
     }
 
     function escapeHtml(text) {
